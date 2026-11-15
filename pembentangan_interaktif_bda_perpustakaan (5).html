@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="ms" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Data: Ke Arah Membuat Keputusan Berdasarkan Data | BDA 2026</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        royal: {
+                            950: '#070D1B',
+                            900: '#0F172A',
+                            850: '#13203E',
+                            800: '#1E3A8A',
+                        },
+                        cyanData: {
+                            400: '#38BDF8',
+                            500: '#06B6D4',
+                            600: '#0891B2',
+                        },
+                        amberGold: {
+                            400: '#FACC15',
+                            500: '#F59E0B',
+                            600: '#D97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Asas Skala Fon untuk Mod Pembentang (Normal vs Besa) */
+        html {
+            font-size: 16px;
+            background-color: #070D1B;
+            color: #F8FAFC;
+        }
+        html.text-scale-large {
+            font-size: 19px;
+        }
+
+        body {
+            overflow-x: hidden;
+            background-color: #050914;
+            color: #F8FAFC;
+        }
+
+        /* Latar Belakang Dinamik Berlapis (Aurora + Seni Bina Data) */
+        @keyframes auroraDriftOne {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+            33% { transform: translate3d(4%, -3%, 0) scale(1.08); }
+            66% { transform: translate3d(-3%, 4%, 0) scale(0.96); }
+        }
+        @keyframes auroraDriftTwo {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+            50% { transform: translate3d(-5%, -4%, 0) scale(1.1); }
+        }
+        @keyframes auroraDriftThree {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+            50% { transform: translate3d(4%, 3%, 0) scale(1.06); }
+        }
+        @keyframes slowSpinReverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        .bg-orb-1 {
+            background: radial-gradient(circle, rgba(29, 78, 216, 0.34) 0%, rgba(30, 58, 138, 0.12) 48%, transparent 72%);
+            animation: auroraDriftOne 22s ease-in-out infinite;
+        }
+        .bg-orb-2 {
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(14, 116, 144, 0.08) 50%, transparent 72%);
+            animation: auroraDriftTwo 26s ease-in-out infinite;
+        }
+        .bg-orb-3 {
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, rgba(217, 119, 6, 0.05) 48%, transparent 72%);
+            animation: auroraDriftThree 28s ease-in-out infinite;
+        }
+        .bg-orb-4 {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.04) 48%, transparent 72%);
+            animation: auroraDriftOne 30s ease-in-out infinite reverse;
+        }
+
+        .bg-architectural-grid {
+            background-image:
+                linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+                linear-gradient(to right, rgba(250, 204, 21, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(250, 204, 21, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px, 48px 48px, 240px 240px, 240px 240px;
+            mask-image: radial-gradient(ellipse 85% 80% at 50% 45%, #000 45%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 45%, #000 45%, transparent 100%);
+        }
+
+        .bg-dot-matrix {
+            background-image: radial-gradient(rgba(148, 163, 184, 0.16) 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, #000 30%, transparent 95%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, #000 30%, transparent 95%);
+        }
+
+        /* Kad Kaca (Glassmorphism) Lutsinar Berlapis dengan Biasan Cahaya */
+        .glass-card {
+            position: relative;
+            background: linear-gradient(155deg, rgba(15, 23, 42, 0.72) 0%, rgba(9, 15, 32, 0.82) 100%);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+                0 20px 42px -15px rgba(2, 6, 23, 0.72);
+            overflow: hidden;
+        }
+
+        .glass-card-elevated {
+            position: relative;
+            background: linear-gradient(145deg, rgba(30, 58, 138, 0.34) 0%, rgba(12, 20, 42, 0.86) 100%);
+            backdrop-filter: blur(22px) saturate(150%);
+            -webkit-backdrop-filter: blur(22px) saturate(150%);
+            border: 1px solid rgba(56, 189, 248, 0.32);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+                0 24px 50px -12px rgba(2, 6, 23, 0.82);
+            overflow: hidden;
+        }
+
+        /* Kesan Sorotan Kursor (Interactive Mouse Spotlight) pada Kad */
+        .spotlight-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(56, 189, 248, 0.14),
+                transparent 65%
+            );
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+        .spotlight-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-hover {
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+        }
+        .glass-hover:hover {
+            transform: translateY(-5px);
+            border-color: rgba(56, 189, 248, 0.55);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.24),
+                0 26px 52px -12px rgba(6, 182, 212, 0.24);
+        }
+
+        /* Corak Seni Bina Perpustakaan & Grid */
+        .library-grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.07) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        .library-pillars-bg {
+            background-image: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.025) 0px,
+                rgba(255, 255, 255, 0.025) 36px,
+                transparent 36px,
+                transparent 120px
+            );
+        }
+
+        /* Animasi Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.08s; }
+        .reveal-delay-2 { transition-delay: 0.16s; }
+        .reveal-delay-3 { transition-delay: 0.24s; }
+        .reveal-delay-4 { transition-delay: 0.32s; }
+
+        /* Animasi Peralihan Tab & Panel */
+        @keyframes panelFadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.995);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .animate-panel-in {
+            animation: panelFadeSlide 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Animasi Kilauan Teks & Aliran Data */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animate-gradient-text {
+            background-size: 200% auto;
+            animation: gradientShift 7s ease infinite;
+        }
+
+        @keyframes pulseRingSlow {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.35; }
+            50% { transform: scale(1.05) rotate(180deg); opacity: 0.65; }
+        }
+        .animate-orbit-slow {
+            animation: pulseRingSlow 24s linear infinite;
+        }
+
+        @keyframes beamSweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(250%); }
+        }
+        .chapter-beam::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 35%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #38BDF8, #FACC15, transparent);
+            animation: beamSweep 5.5s ease-in-out infinite;
+        }
+
+        /* Pembahagi Bab Parallax */
+        .chapter-banner {
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            background: radial-gradient(circle at 82% 50%, rgba(30, 64, 175, 0.48) 0%, transparent 58%),
+                        linear-gradient(135deg, rgba(7, 14, 32, 0.92) 0%, rgba(20, 38, 91, 0.88) 50%, rgba(8, 18, 40, 0.94) 100%);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(56, 189, 248, 0.32);
+            border-bottom: 1px solid rgba(250, 204, 21, 0.28);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 20px 50px rgba(2, 6, 23, 0.65);
+        }
+
+        .chapter-numeral-stroke {
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(56, 189, 248, 0.28);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(56, 189, 248, 0.03) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        /* Bar Skrol Kemas */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050914;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E3A8A;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06B6D4;
+        }
+
+        /* Offset anchor supaya tidak tertutup bar atas */
+        section[data-nav-section] {
+            scroll-margin-top: 5.25rem;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- ===================================================================== -->
+    <!-- LATAR BELAKANG HIDUP BERLAPIS (GLOBAL AMBIENT & DATA CONSTELLATION)   -->
+    <!-- ===================================================================== -->
+    <div id="global-ambient-backdrop" class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        <!-- Lapisan 1: Gradien Asas Diraja Gelap -->
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#11224D_0%,_#091124_48%,_#040812_100%)]"></div>
+
+        <!-- Lapisan 2: Aurora Cahaya Beranimasi -->
+        <div class="bg-orb-1 absolute -top-40 -left-32 w-[44rem] h-[44rem] rounded-full blur-[90px]"></div>
+        <div class="bg-orb-2 absolute top-1/4 -right-36 w-[40rem] h-[40rem] rounded-full blur-[95px]"></div>
+        <div class="bg-orb-3 absolute bottom-[-10%] left-[12%] w-[38rem] h-[38rem] rounded-full blur-[100px]"></div>
+        <div class="bg-orb-4 absolute top-[58%] right-[18%] w-[32rem] h-[32rem] rounded-full blur-[95px]"></div>
+
+        <!-- Lapisan 3: Grid Seni Bina Perpustakaan & Matriks Titik -->
+        <div class="bg-architectural-grid absolute inset-0 opacity-85"></div>
+        <div class="bg-dot-matrix absolute inset-0 opacity-60"></div>
+
+        <!-- Lapisan 4: Lingkaran Geometri Astrolab Data (SVG Halus) -->
+        <svg class="absolute -right-48 top-16 w-[620px] h-[620px] opacity-[0.14] text-cyan-300" style="animation: slowSpinReverse 75s linear infinite;" viewBox="0 0 600 600" fill="none">
+            <circle cx="300" cy="300" r="270" stroke="currentColor" stroke-width="1" stroke-dasharray="6 10"/>
+            <circle cx="300" cy="300" r="210" stroke="#FACC15" stroke-width="1" stroke-dasharray="2 14"/>
+            <circle cx="300" cy="300" r="145" stroke="currentColor" stroke-width="0.8"/>
+            <line x1="300" y1="10" x2="300" y2="590" stroke="currentColor" stroke-width="0.6" stroke-dasharray="4 8"/>
+            <line x1="10" y1="300" x2="590" y2="300" stroke="currentColor" stroke-width="0.6" stroke-dasharray="4 8"/>
+        </svg>
+
+        <svg class="absolute -left-56 bottom-10 w-[560px] h-[560px] opacity-[0.11] text-amber-300 animate-orbit-slow" viewBox="0 0 600 600" fill="none">
+            <circle cx="300" cy="300" r="250" stroke="currentColor" stroke-width="1" stroke-dasharray="10 12"/>
+            <circle cx="300" cy="300" r="180" stroke="#38BDF8" stroke-width="1" stroke-dasharray="3 9"/>
+        </svg>
+
+        <!-- Lapisan 5: Kanvas Jaringan Nod Data & Partikel Bercahaya -->
+        <canvas id="bg-constellation-canvas" class="absolute inset-0 w-full h-full opacity-90"></canvas>
+
+        <!-- Lapisan 6: Bingkai Vignette Halus Supaya Teks Sentiasa Jelas -->
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_55%,rgba(3,7,18,0.65)_100%)]"></div>
+    </div>
+
+    <!-- Bar Kemajuan Skrol di Bahagian Paling Atas -->
+    <div class="fixed top-0 left-0 right-0 h-1 bg-slate-900/90 z-50">
+        <div id="scroll-progress-bar" class="h-full w-0 bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-400 transition-all duration-150"></div>
+    </div>
+
+    <!-- Bar Navigasi Pembentang (Atas Sahaja — Bebas Gangguan di Bahagian Tepi) -->
+    <header class="fixed top-1 left-0 right-0 z-40 px-3 sm:px-6 pt-2 pointer-events-none">
+        <nav class="max-w-7xl mx-auto glass-card rounded-2xl px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 pointer-events-auto border border-white/15 shadow-2xl">
+            
+            <!-- Kiri: Penunjuk Bahagian Semasa + Dropdown Lompat Terus -->
+            <div class="relative flex items-center gap-2 min-w-0">
+                <a href="#bahagian-0" class="hidden md:flex items-center gap-2 pr-3 border-r border-white/10 text-xs font-mono uppercase tracking-wider text-cyan-400 hover:text-cyan-300 shrink-0">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                    BDA 2026
+                </a>
+
+                <div class="relative">
+                    <button id="section-dropdown-btn" type="button" aria-expanded="false" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left text-xs sm:text-sm font-semibold text-white transition max-w-[210px] sm:max-w-sm md:max-w-md">
+                        <span id="current-section-label" class="truncate">Bahagian 0: Muka Hadapan</span>
+                        <svg class="w-4 h-4 text-cyan-400 shrink-0 transition-transform duration-200" id="dropdown-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Menu Dropdown Bahagian -->
+                    <div id="section-dropdown-menu" class="hidden absolute left-0 mt-2 w-80 sm:w-96 max-h-[75vh] overflow-y-auto glass-card rounded-2xl p-2 border border-cyan-500/30 shadow-2xl z-50">
+                        <div class="px-3 py-1.5 text-[11px] font-mono uppercase tracking-wider text-slate-400 border-b border-white/10 mb-1">
+                            Lompat Terus ke Bahagian
+                        </div>
+                        <div id="dropdown-links-container" class="space-y-0.5 text-sm">
+                            <!-- Dijana secara automatik oleh JS berdasarkan semua seksyen -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kanan: Kawalan Anak Panah, Saiz Teks Tunggal & Fullscreen -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <!-- Anak Panah Atas & Bawah -->
+                <div class="flex items-center bg-white/5 rounded-xl border border-white/10 p-0.5">
+                    <button id="prev-section-btn" type="button" title="Bahagian Sebelumnya (Anak Panah Atas)" class="p-1.5 sm:p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition" aria-label="Bahagian Sebelumnya">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 15l7-7 7 7"/>
+                        </svg>
+                    </button>
+                    <div class="w-px h-4 bg-white/10"></div>
+                    <button id="next-section-btn" type="button" title="Bahagian Seterusnya (Anak Panah Bawah)" class="p-1.5 sm:p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition" aria-label="Bahagian Seterusnya">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Butang Togol Tunggal: Saiz Teks: Normal / Besar -->
+                <button id="text-size-toggle-btn" type="button" class="px-3 py-1.5 sm:py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs sm:text-sm font-medium text-slate-200 hover:text-white transition whitespace-nowrap">
+                    Saiz Teks: Normal
+                </button>
+
+                <!-- Butang Kawalan Skrin Penuh: Fullscreen / Exit Fullscreen -->
+                <button id="fullscreen-toggle-btn" type="button" class="px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 border border-cyan-400/40 text-xs sm:text-sm font-semibold text-cyan-300 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                    <svg id="fullscreen-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
+                    <span id="fullscreen-label">Fullscreen</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Notifikasi Toast Ringkas (Ganti alert()) -->
+    <div id="toast-notification" class="fixed bottom-5 right-5 z-50 hidden max-w-sm glass-card border border-cyan-400/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl text-sm flex items-center gap-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+        <span id="toast-message">Mesej sistem</span>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- BAHAGIAN 0: MUKA HADAPAN (MULTI-LAYER PARALLAX HERO BANNER)           -->
+    <!-- ===================================================================== -->
+    <section id="bahagian-0" data-nav-section data-nav-title="Bahagian 0: Muka Hadapan" class="relative z-10 min-h-screen flex items-center pt-28 pb-16 overflow-hidden">
+        
+        <!-- Lapisan Parallax 1: Tiang Seni Bina Perpustakaan -->
+        <div data-parallax-speed="0.22" class="absolute inset-0 library-pillars-bg opacity-75 pointer-events-none"></div>
+        
+        <!-- Lapisan Parallax 2: Sorotan Cahaya Fokus Hero -->
+        <div data-parallax-speed="-0.15" class="absolute -top-24 left-1/4 w-[38rem] h-[28rem] rounded-full bg-cyan-500/15 blur-[130px] pointer-events-none"></div>
+        <div data-parallax-speed="0.16" class="absolute bottom-8 right-1/4 w-[30rem] h-[24rem] rounded-full bg-amber-500/12 blur-[120px] pointer-events-none"></div>
+
+        <!-- Kandungan Utama Muka Hadapan -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            
+            <!-- Lencana Agensi & Acara -->
+            <div class="reveal flex flex-wrap items-center gap-3 mb-6">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-950/90 border border-cyan-400/40 text-cyan-300 font-semibold text-xs sm:text-sm tracking-wide shadow-lg">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    USM | Nibong Tebal
+                </span>
+                <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/35 text-amber-300 font-medium text-xs sm:text-sm">
+                    Seminar Semai Ilmu Staf Perpustakaan Musa Mohamad Siri 3/2026 
+                </span>
+            </div>
+
+            <!-- Tajuk Utama & Maklumat Pembentang -->
+            <div class="grid lg:grid-cols-12 gap-8 items-center mb-10">
+                <div class="lg:col-span-8 reveal reveal-delay-1">
+                    <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.2] mb-5">
+                        ANALISIS DATA: <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-300 to-amber-300 animate-gradient-text">KE ARAH MEMBUAT KEPUTUSAN BERDASARKAN DATA</span>
+                    </h1>
+                    <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+                        Memperkasa pengurusan perpustakaan melalui pemahaman data, analisis trend penggunaan, dan perancangan perkhidmatan berasaskan bukti.
+                    </p>
+                </div>
+
+                <!-- Kad Pembentang -->
+                <div class="lg:col-span-4 reveal reveal-delay-2">
+                    <div class="glass-card-elevated spotlight-card glass-hover rounded-3xl p-6 border border-cyan-400/35 relative overflow-hidden">
+                        <div class="absolute -top-6 -right-6 w-28 h-28 bg-amber-400/15 rounded-full blur-xl"></div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400/15 border border-amber-400/35 text-amber-300 font-mono text-xs uppercase tracking-wider mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                            Pembentang
+                        </span>
+                        <h2 class="font-display text-xl sm:text-2xl font-bold text-white mb-1 leading-snug">
+                            Nurul Aini bt Abdul Rahman
+                        </h2>
+                        <div class="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
+                            <span>Perpustakaan Musa Mohamad</span>
+                            <span class="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-400/30 font-mono text-cyan-300">Siri 3/2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kad Pintasan Bab Pembentangan (Dinaikkan ke Atas) -->
+            <div class="reveal reveal-delay-2">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-1 rounded-full bg-gradient-to-r from-cyan-400 to-amber-400"></span>
+                        <h3 class="font-display text-base sm:text-lg font-bold text-white uppercase tracking-wide">
+                            Kandungan Pembentangan
+                        </h3>
+                    </div>
+                    <span class="hidden sm:inline text-xs font-mono text-slate-400">Klik mana-mana bab untuk melompat terus</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <a href="#bab-1" class="group glass-card spotlight-card glass-hover hover:bg-blue-900/40 rounded-2xl p-5 sm:p-6 border border-white/15 hover:border-cyan-400/60 transition flex items-center justify-between gap-3">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-cyan-400 block mb-1">BAB 1</span>
+                            <h4 class="font-display font-bold text-white text-base sm:text-lg group-hover:text-cyan-200 transition leading-snug">Pengenalan Big Data Analytics</h4>
+                        </div>
+                        <span class="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-cyan-500/25 group-hover:translate-x-1 flex items-center justify-center text-cyan-300 transition shrink-0">→</span>
+                    </a>
+                    <a href="#bab-2" class="group glass-card spotlight-card glass-hover hover:bg-blue-900/40 rounded-2xl p-5 sm:p-6 border border-white/15 hover:border-sky-400/60 transition flex items-center justify-between gap-3">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-sky-400 block mb-1">BAB 2</span>
+                            <h4 class="font-display font-bold text-white text-base sm:text-lg group-hover:text-sky-200 transition leading-snug">Ekosistem Data dalam Perpustakaan</h4>
+                        </div>
+                        <span class="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-sky-500/25 group-hover:translate-x-1 flex items-center justify-center text-sky-300 transition shrink-0">→</span>
+                    </a>
+                    <a href="#bab-3" class="group glass-card spotlight-card glass-hover hover:bg-blue-900/40 rounded-2xl p-5 sm:p-6 border border-white/15 hover:border-emerald-400/60 transition flex items-center justify-between gap-3">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-emerald-400 block mb-1">BAB 3</span>
+                            <h4 class="font-display font-bold text-white text-base sm:text-lg group-hover:text-emerald-200 transition leading-snug">Strategi Pembudayaan &amp; Pelaksanaan</h4>
+                        </div>
+                        <span class="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-emerald-500/25 group-hover:translate-x-1 flex items-center justify-center text-emerald-300 transition shrink-0">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PEMBAHAGI PARALLAX BAB 1                                              -->
+    <!-- ===================================================================== -->
+    <div id="bab-1" class="chapter-banner chapter-beam py-16 sm:py-24">
+        <div data-parallax-speed="0.16" class="absolute inset-0 library-grid-bg opacity-45 pointer-events-none"></div>
+        <div data-parallax-speed="-0.12" class="absolute -left-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-cyan-500/15 blur-[95px] pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div class="reveal max-w-3xl">
+                <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-mono text-xs sm:text-sm font-bold tracking-widest mb-4">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                    BAB 1
+                </span>
+                <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.18]">
+                    PENGENALAN BIG DATA ANALYTICS
+                </h2>
+                <p class="text-slate-300 mt-4 text-base sm:text-lg leading-relaxed max-w-2xl">
+                    Asas data, klasifikasi, ciri data berkualiti, konsep 5V Data Raya serta contoh penggunaannya.
+                </p>
+            </div>
+            <div class="relative flex items-center justify-center shrink-0 self-end md:self-center">
+                <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full border border-dashed border-cyan-400/30 animate-orbit-slow absolute"></div>
+                <div class="font-display text-7xl sm:text-8xl font-extrabold chapter-numeral-stroke select-none leading-none">
+                    01
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- BAB 1: KANDUNGAN                                                      -->
+    <!-- ===================================================================== -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+        <!-- 1.1 Pengenalan Kepada Data -->
+        <section id="bab-1-1" data-nav-section data-nav-title="Bab 1.1: Pengenalan Kepada Data" class="reveal">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-400/30 font-mono text-sm font-bold text-cyan-300">1.1</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">Pengenalan Kepada Data</h3>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-6 items-stretch">
+                <!-- Definisi Data -->
+                <div class="lg:col-span-6 glass-card-elevated spotlight-card rounded-3xl p-6 sm:p-8 flex flex-col justify-center relative overflow-hidden">
+                    <div class="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-amber-400/10 blur-2xl pointer-events-none"></div>
+                    <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                        Definisi Data
+                    </div>
+                    <blockquote class="text-lg sm:text-xl font-semibold text-white leading-relaxed border-l-4 border-amber-400 pl-5">
+                        "Data ialah maklumat mentah yang dikumpulkan melalui pemerhatian, interaksi, atau sistem — dan digunakan untuk mengenal pasti corak, membuat keputusan, serta meramal tingkah laku."
+                    </blockquote>
+                </div>
+
+                <!-- 3 Prinsip Utama -->
+                <div class="lg:col-span-6 glass-card spotlight-card rounded-3xl p-6 sm:p-8">
+                    <div class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-4">3 Prinsip Utama</div>
+                    <div class="space-y-4">
+                        <div class="group flex items-start gap-4 p-4 rounded-2xl bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-400/40 transition">
+                            <span class="w-8 h-8 rounded-xl bg-cyan-500/20 group-hover:bg-cyan-500/30 text-cyan-300 font-mono font-bold flex items-center justify-center shrink-0 transition">1</span>
+                            <p class="text-slate-100 font-medium text-sm sm:text-base pt-1 leading-relaxed">
+                                Setiap interaksi, transaksi atau perkhidmatan menghasilkan data
+                            </p>
+                        </div>
+                        <div class="group flex items-start gap-4 p-4 rounded-2xl bg-white/5 hover:bg-sky-500/10 border border-white/10 hover:border-sky-400/40 transition">
+                            <span class="w-8 h-8 rounded-xl bg-sky-500/20 group-hover:bg-sky-500/30 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0 transition">2</span>
+                            <p class="text-slate-100 font-medium text-sm sm:text-base pt-1 leading-relaxed">
+                                Data membolehkan kita memahami realiti, bukan sekadar bergantung pada andaian
+                            </p>
+                        </div>
+                        <div class="group flex items-start gap-4 p-4 rounded-2xl bg-white/5 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 transition">
+                            <span class="w-8 h-8 rounded-xl bg-amber-500/20 group-hover:bg-amber-500/30 text-amber-300 font-mono font-bold flex items-center justify-center shrink-0 transition">3</span>
+                            <p class="text-slate-100 font-medium text-sm sm:text-base pt-1 leading-relaxed">
+                                Digunakan untuk penambahbaikan proses, pengukuran prestasi, dan perancangan masa depan
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.2 Klasifikasi Data (Tab Interaktif 4 Kategori) -->
+        <section id="bab-1-2" data-nav-section data-nav-title="Bab 1.2: Klasifikasi Data" class="reveal">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-400/30 font-mono text-sm font-bold text-cyan-300">1.2</span>
+                    <h3 class="font-display text-2xl sm:text-3xl font-bold text-white">Klasifikasi Data</h3>
+                </div>
+                <span class="text-xs font-mono text-slate-400">Klik tab untuk melihat setiap kategori</span>
+            </div>
+
+            <!-- Butang Tab 4 Kategori -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 mb-6" role="tablist">
+                <button type="button" data-tab-target="klasifikasi-a" class="klasifikasi-tab-btn active px-4 py-3 rounded-2xl font-semibold text-xs sm:text-sm text-left transition border bg-cyan-500/20 border-cyan-400 text-white shadow-lg">
+                    <span class="block font-mono text-[11px] text-cyan-300">KATEGORI A</span>
+                    Berdasarkan Bentuk
+                </button>
+                <button type="button" data-tab-target="klasifikasi-b" class="klasifikasi-tab-btn px-4 py-3 rounded-2xl font-semibold text-xs sm:text-sm text-left transition border bg-white/5 border-white/10 text-slate-300 hover:bg-white/10">
+                    <span class="block font-mono text-[11px] text-slate-400">KATEGORI B</span>
+                    Berdasarkan Pengkelasan
+                </button>
+                <button type="button" data-tab-target="klasifikasi-c" class="klasifikasi-tab-btn px-4 py-3 rounded-2xl font-semibold text-xs sm:text-sm text-left transition border bg-white/5 border-white/10 text-slate-300 hover:bg-white/10">
+                    <span class="block font-mono text-[11px] text-slate-400">KATEGORI C</span>
+                    Sumber Pengumpulan
+                </button>
+                <button type="button" data-tab-target="klasifikasi-d" class="klasifikasi-tab-btn px-4 py-3 rounded-2xl font-semibold text-xs sm:text-sm text-left transition border bg-white/5 border-white/10 text-slate-300 hover:bg-white/10">
+                    <span class="block font-mono text-[11px] text-slate-400">KATEGORI D</span>
+                    Bahasa Pengisian & Komputer
+                </button>
+            </div>
+
+            <!-- Panel Tab A: Berdasarkan Bentuk -->
+            <div id="klasifikasi-a" class="klasifikasi-panel glass-card rounded-3xl p-6 sm:p-8">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-6 rounded-2xl bg-slate-900/80 border border-cyan-400/25">
+                        <span class="inline-block px-3 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 font-mono text-xs font-bold mb-3">01</span>
+                        <h4 class="font-display text-lg font-bold text-white mb-2">Data Berstruktur</h4>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                            Data yang tersusun dalam format tertentu seperti jadual dalam pangkalan data.
+                        </p>
+                        <div class="p-3 rounded-xl bg-cyan-950/50 border border-cyan-500/20 text-xs text-cyan-200">
+                            <span class="font-bold">Contoh:</span> Variabel yang disimpan di dalam Pangkalan Data seperti Nama, umur, alamat.
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-slate-900/80 border border-amber-400/25">
+                        <span class="inline-block px-3 py-1 rounded-lg bg-amber-500/15 text-amber-300 font-mono text-xs font-bold mb-3">02</span>
+                        <h4 class="font-display text-lg font-bold text-white mb-2">Data Tidak Berstruktur</h4>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                            Data yang tidak mengikut format tetap dan sukar dikategorikan.
+                        </p>
+                        <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/20 text-xs text-amber-200">
+                            <span class="font-bold">Contoh:</span> Gambar, video, audio, dokumen PDF.
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-slate-900/80 border border-sky-400/25">
+                        <span class="inline-block px-3 py-1 rounded-lg bg-sky-500/15 text-sky-300 font-mono text-xs font-bold mb-3">03</span>
+                        <h4 class="font-display text-lg font-bold text-white mb-2">Data Separa Berstruktur</h4>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                            Data yang mempunyai struktur tertentu tetapi tidak sepenuhnya seperti pangkalan data tradisional.
+                        </p>
+                        <div class="p-3 rounded-xl bg-sky-950/50 border border-sky-500/20 text-xs text-sky-200">
+                            <span class="font-bold">Contoh:</span> JSON, XML, CSV.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Tab B: Berdasarkan Pengkelasan -->
+            <div id="klasifikasi-b" class="klasifikasi-panel hidden glass-card rounded-3xl p-6 sm:p-8">
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Data Kuantitatif -->
+                    <div class="p-6 rounded-2xl bg-slate-900/80 border border-cyan-400/30">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-display text-xl font-bold text-cyan-300">Data Kuantitatif (Numerik)</h4>
+                            <span class="px-2.5 py-1 rounded-md bg-cyan-500/15 text-cyan-300 font-mono text-xs">Nombor</span>
+                        </div>
+                        <p class="text-slate-200 text-sm leading-relaxed mb-4">
+                            Data berbentuk nombor yang boleh dikira atau diukur.
+                        </p>
+                        <div class="p-3 rounded-xl bg-white/5 text-xs text-slate-300 mb-4">
+                            <span class="font-semibold text-cyan-300">Contoh:</span> Jumlah pelajar dalam kelas: 35 orang; Suhu harian: 28°C.
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                            <div class="p-4 rounded-xl bg-cyan-950/40 border border-cyan-500/20">
+                                <h5 class="font-bold text-white text-sm mb-1">1. Data Diskrit</h5>
+                                <p class="text-xs text-slate-300 leading-relaxed mb-2">
+                                    Nilai tetap dalam nombor bulat dan tidak boleh dipecahkan.
+                                </p>
+                                <p class="text-[11px] text-cyan-200">
+                                    <span class="font-semibold">Cth:</span> Bilangan ahli keluarga: 1, 2, 3...; Bilangan telur dalam karton.
+                                </p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-cyan-950/40 border border-cyan-500/20">
+                                <h5 class="font-bold text-white text-sm mb-1">2. Data Berterusan</h5>
+                                <p class="text-xs text-slate-300 leading-relaxed mb-2">
+                                    Nilai yang boleh diukur dalam satu julat dan boleh ada perpuluhan.
+                                </p>
+                                <p class="text-[11px] text-cyan-200">
+                                    <span class="font-semibold">Cth:</span> Berat badan: 55.5 kg, 60.2 kg; Suhu air.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Kualitatif -->
+                    <div class="p-6 rounded-2xl bg-slate-900/80 border border-amber-400/30 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-display text-xl font-bold text-amber-300">Data Kualitatif (Kategori)</h4>
+                                <span class="px-2.5 py-1 rounded-md bg-amber-500/15 text-amber-300 font-mono text-xs">Bukan Nombor</span>
+                            </div>
+                            <p class="text-slate-200 text-sm leading-relaxed mb-4">
+                                Data bukan nombor yang menerangkan ciri atau kategori sesuatu perkara. Tidak boleh dikira secara matematik tetapi boleh dikelaskan dan dibandingkan.
+                            </p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-amber-950/35 border border-amber-500/25 space-y-2 text-xs text-amber-100">
+                            <div class="font-bold text-amber-300 uppercase tracking-wider">Contoh Kategori:</div>
+                            <ul class="space-y-1.5 list-disc list-inside text-slate-200">
+                                <li><span class="font-semibold text-white">Warna kereta:</span> merah, biru, hitam</li>
+                                <li><span class="font-semibold text-white">Tahap kepuasan:</span> rendah, sederhana, tinggi</li>
+                                <li><span class="font-semibold text-white">Pekerjaan:</span> doktor, guru, jurutera</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Tab C: Berdasarkan Sumber Pengumpulan (Side-by-Side) -->
+            <div id="klasifikasi-c" class="klasifikasi-panel hidden glass-card rounded-3xl p-6 sm:p-8">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Data Primer -->
+                    <div class="p-6 rounded-2xl bg-slate-900/85 border border-cyan-400/30">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-display text-xl font-bold text-white">Data Primer (Primary Data)</h4>
+                            <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-semibold">Sumber Asal</span>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div class="p-3.5 rounded-xl bg-white/5">
+                                <span class="block text-xs font-mono uppercase text-cyan-400 mb-1">Sumber Pengumpulan</span>
+                                <p class="text-slate-200">Dikumpul sendiri oleh penyelidik melalui survei, eksperimen, temu bual, atau pemerhatian.</p>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/25">
+                                <span class="block text-xs font-mono uppercase text-emerald-400 mb-1">Kelebihan</span>
+                                <p class="text-slate-200">Lebih relevan, terkini, dan menepati keperluan kajian.</p>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-rose-950/35 border border-rose-500/25">
+                                <span class="block text-xs font-mono uppercase text-rose-400 mb-1">Kekurangan</span>
+                                <p class="text-slate-200">Kos tinggi, mengambil masa lama, dan risiko bias jika tidak dikawal.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Sekunder -->
+                    <div class="p-6 rounded-2xl bg-slate-900/85 border border-amber-400/30">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-display text-xl font-bold text-white">Data Sekunder (Secondary Data)</h4>
+                            <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold">Sumber Sedia Ada</span>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div class="p-3.5 rounded-xl bg-white/5">
+                                <span class="block text-xs font-mono uppercase text-amber-400 mb-1">Sumber Pengumpulan</span>
+                                <p class="text-slate-200">Diperoleh daripada sumber sedia ada seperti agensi kerajaan, jurnal akademik, atau laporan organisasi.</p>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/25">
+                                <span class="block text-xs font-mono uppercase text-emerald-400 mb-1">Kelebihan</span>
+                                <p class="text-slate-200">Mudah dan cepat didapati, serta menjimatkan kos dan tenaga.</p>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-rose-950/35 border border-rose-500/25">
+                                <span class="block text-xs font-mono uppercase text-rose-400 mb-1">Kekurangan</span>
+                                <p class="text-slate-200">Mungkin kurang tepat, sudah lapuk, dan tidak mengikut keperluan khusus kajian.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Tab D: Bahasa Pengisian & Pengkomputeran -->
+            <div id="klasifikasi-d" class="klasifikasi-panel hidden glass-card rounded-3xl p-6 sm:p-8">
+                <div class="grid md:grid-cols-2 gap-6 mb-5">
+                    <div class="p-6 rounded-2xl bg-slate-900/85 border border-white/10">
+                        <h4 class="font-display text-lg font-bold text-cyan-300 mb-4">Data Types in C</h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="p-3 rounded-xl bg-white/5 flex flex-wrap items-center justify-between gap-2">
+                                <span class="font-semibold text-white">Primitive</span>
+                                <span class="font-mono text-xs text-cyan-300">int, float, double, char</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 flex flex-wrap items-center justify-between gap-2">
+                                <span class="font-semibold text-white">Derived</span>
+                                <span class="font-mono text-xs text-sky-300">Array, Function, Pointer</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 flex flex-wrap items-center justify-between gap-2">
+                                <span class="font-semibold text-white">User Defined</span>
+                                <span class="font-mono text-xs text-amber-300">Structure, Union, Enum</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-slate-900/85 border border-white/10">
+                        <h4 class="font-display text-lg font-bold text-amber-300 mb-4">Jenis Data Umum</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">Integer</span>
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">Float / Double</span>
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">Character</span>
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">String</span>
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">Boolean</span>
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">Date / Time</span>
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">Arrays</span>
+                            <span class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-slate-200">2D Arrays</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 rounded-2xl bg-cyan-500/15 border border-cyan-400/35 text-sm text-cyan-200 flex items-center gap-3">
+                    <span class="px-2.5 py-1 rounded-lg bg-cyan-400 text-slate-950 font-mono text-xs font-bold shrink-0">NOTA PENTING</span>
+                    <span>Jenis data sangat penting dalam pemprosesan dan penganalisisan data besar.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.3 Ciri-Ciri Data Yang Berkualiti (8 Kad) -->
+        <section id="bab-1-3" data-nav-section data-nav-title="Bab 1.3: Ciri-Ciri Data Berkualiti" class="reveal">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-400/30 font-mono text-sm font-bold text-cyan-300">1.3</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">Ciri-Ciri Data Yang Berkualiti</h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-cyan-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Relevan</h4>
+                        <span class="px-2 py-0.5 rounded bg-cyan-500/15 font-mono text-xs text-cyan-300">01</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Sesuai dengan keperluan dan tujuan analisis.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-sky-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Lengkap</h4>
+                        <span class="px-2 py-0.5 rounded bg-sky-500/15 font-mono text-xs text-sky-300">02</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Tiada maklumat penting yang tertinggal atau kosong.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-amber-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Tepat</h4>
+                        <span class="px-2 py-0.5 rounded bg-amber-500/15 font-mono text-xs text-amber-300">03</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Bebas daripada kesilapan dan menggambarkan keadaan sebenar.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-emerald-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Konsisten</h4>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/15 font-mono text-xs text-emerald-300">04</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Seragam format dan nilainya di semua sistem.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-cyan-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Boleh Dipercayai</h4>
+                        <span class="px-2 py-0.5 rounded bg-cyan-500/15 font-mono text-xs text-cyan-300">05</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Diambil daripada sumber yang sah dan diyakini.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-sky-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Sentiasa Dikemaskini</h4>
+                        <span class="px-2 py-0.5 rounded bg-sky-500/15 font-mono text-xs text-sky-300">06</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Rekod terkini dan sentiasa diselenggara.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-amber-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Boleh Diakses</h4>
+                        <span class="px-2 py-0.5 rounded bg-amber-500/15 font-mono text-xs text-amber-300">07</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Mudah dicapai oleh pengguna yang dibenarkan apabila diperlukan.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-t-2 border-t-emerald-400">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-display font-bold text-lg text-white">Sahih</h4>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/15 font-mono text-xs text-emerald-300">08</span>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">Disahkan ketulenan dan kebenarannya.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.4 Konsep Data Raya (Big Data) & 5V -->
+        <section id="bab-1-4" data-nav-section data-nav-title="Bab 1.4: Konsep Data Raya & 5V" class="reveal">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-400/30 font-mono text-sm font-bold text-cyan-300">1.4</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">Konsep Data Raya (Big Data) &amp; 5V</h3>
+            </div>
+
+            <!-- Definisi Big Data -->
+            <div class="glass-card-elevated spotlight-card rounded-3xl p-6 sm:p-8 mb-8">
+                <div class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">Definisi Data Raya (Big Data)</div>
+                <p class="text-lg sm:text-xl font-semibold text-white leading-relaxed">
+                    "Big Data merujuk kepada data berskala besar, pelbagai jenis, dan berubah dengan cepat, yang memerlukan kaedah baharu dari segi penyimpanan, pengurusan dan penganalisisan bagi tujuan membuat keputusan dengan lebih tepat dan pantas."
+                </p>
+            </div>
+
+            <!-- 5Vs of Big Data -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- V1: Volume -->
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 flex flex-col justify-between border-t-4 border-t-cyan-400 relative">
+                    <span class="absolute top-3 right-4 font-display text-4xl font-extrabold text-cyan-400/10 select-none">V1</span>
+                    <div>
+                        <span class="font-mono text-xs font-bold text-cyan-400">01 / 5V</span>
+                        <h4 class="font-display text-xl font-bold text-white mt-1 mb-2">Volume <span class="text-sm font-normal text-slate-400">(Jumlah)</span></h4>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Jumlah data yang sangat besar (dari MB/GB ke Terabyte, Petabyte, Exabyte).
+                        </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-cyan-950/60 border border-cyan-500/25 text-xs text-cyan-100 leading-relaxed">
+                        <span class="font-bold text-cyan-300 block mb-0.5">Konteks Perpustakaan:</span>
+                        Jutaan rekod pinjaman, log carian OPAC, dan capaian e-jurnal setiap tahun.
+                    </div>
+                </div>
+
+                <!-- V2: Velocity -->
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 flex flex-col justify-between border-t-4 border-t-sky-400 relative">
+                    <span class="absolute top-3 right-4 font-display text-4xl font-extrabold text-sky-400/10 select-none">V2</span>
+                    <div>
+                        <span class="font-mono text-xs font-bold text-sky-400">02 / 5V</span>
+                        <h4 class="font-display text-xl font-bold text-white mt-1 mb-2">Velocity <span class="text-sm font-normal text-slate-400">(Kelajuan)</span></h4>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Data dijana dan diproses dalam masa sebenar (<em>real-time</em>).
+                        </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-sky-950/60 border border-sky-500/25 text-xs text-sky-100 leading-relaxed">
+                        <span class="font-bold text-sky-300 block mb-0.5">Konteks Perpustakaan:</span>
+                        Rekod keluar-masuk pintu automatik, tempahan bilik, dan muat turun e-book secara langsung.
+                    </div>
+                </div>
+
+                <!-- V3: Variety -->
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 flex flex-col justify-between border-t-4 border-t-amber-400 relative">
+                    <span class="absolute top-3 right-4 font-display text-4xl font-extrabold text-amber-400/10 select-none">V3</span>
+                    <div>
+                        <span class="font-mono text-xs font-bold text-amber-400">03 / 5V</span>
+                        <h4 class="font-display text-xl font-bold text-white mt-1 mb-2">Variety <span class="text-sm font-normal text-slate-400">(Kepelbagaian)</span></h4>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Data hadir dalam pelbagai bentuk (berstruktur, tidak berstruktur, separa berstruktur).
+                        </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/45 border border-amber-500/25 text-xs text-amber-100 leading-relaxed">
+                        <span class="font-bold text-amber-300 block mb-0.5">Konteks Perpustakaan:</span>
+                        Jadual keahlian, fail PDF tesis, rakaman video program, dan log emel rujukan.
+                    </div>
+                </div>
+
+                <!-- V4: Veracity -->
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 flex flex-col justify-between border-t-4 border-t-emerald-400 relative">
+                    <span class="absolute top-3 right-4 font-display text-4xl font-extrabold text-emerald-400/10 select-none">V4</span>
+                    <div>
+                        <span class="font-mono text-xs font-bold text-emerald-400">04 / 5V</span>
+                        <h4 class="font-display text-xl font-bold text-white mt-1 mb-2">Veracity <span class="text-sm font-normal text-slate-400">(Ketepatan)</span></h4>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Kualiti data yang tepat, bersih, dan bebas ralat supaya keputusan tidak tersasar.
+                        </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/25 text-xs text-emerald-100 leading-relaxed">
+                        <span class="font-bold text-emerald-300 block mb-0.5">Konteks Perpustakaan:</span>
+                        Memastikan rekod buku, status ahli, dan statistik rujukan tidak bertindih atau rosak.
+                    </div>
+                </div>
+
+                <!-- V5: Value -->
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 flex flex-col justify-between border-t-4 border-t-purple-400 relative">
+                    <span class="absolute top-3 right-4 font-display text-4xl font-extrabold text-purple-400/10 select-none">V5</span>
+                    <div>
+                        <span class="font-mono text-xs font-bold text-purple-300">05 / 5V</span>
+                        <h4 class="font-display text-xl font-bold text-white mt-1 mb-2">Value <span class="text-sm font-normal text-slate-400">(Nilai)</span></h4>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Keupayaan menukar data mentah menjadi maklumat berguna untuk tindakan.
+                        </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-purple-950/50 border border-purple-500/25 text-xs text-purple-100 leading-relaxed">
+                        <span class="font-bold text-purple-300 block mb-0.5">Konteks Perpustakaan:</span>
+                        Data pinjaman digunakan untuk cadangan pembelian buku baharu dan penambahbaikan OPAC.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.5 Jadual Perbezaan Data Tradisional vs Data Raya (8 Ciri) -->
+        <section id="bab-1-5" data-nav-section data-nav-title="Bab 1.5: Data Tradisional vs Data Raya" class="reveal">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-400/30 font-mono text-sm font-bold text-cyan-300">1.5</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white">Perbezaan Antara Data Tradisional dan Data Raya</h3>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden border border-white/15">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-blue-950/90 border-b border-white/15">
+                                <th class="py-4 px-5 font-display font-bold text-sm text-amber-300 uppercase tracking-wider w-1/5">Ciri</th>
+                                <th class="py-4 px-5 font-display font-bold text-sm text-slate-200 uppercase tracking-wider w-2/5">Data Tradisional</th>
+                                <th class="py-4 px-5 font-display font-bold text-sm text-cyan-300 uppercase tracking-wider w-2/5">Data Raya (Big Data)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/10 text-sm">
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Isipadu (Volume)</td>
+                                <td class="py-3.5 px-5 text-slate-300">Kecil ke sederhana (MB/GB)</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Sangat besar (TB, PB, EB)</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Jenis Data</td>
+                                <td class="py-3.5 px-5 text-slate-300">Berstruktur sahaja, cth: pangkalan data</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Berstruktur, tidak berstruktur &amp; separa struktur</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Kelajuan (Velocity)</td>
+                                <td class="py-3.5 px-5 text-slate-300">Dikemaskini secara berkala / batch</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Masa nyata / real-time</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Sumber Data</td>
+                                <td class="py-3.5 px-5 text-slate-300">Terhad, cth: borang, sistem dalaman</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Pelbagai: media sosial, sensor, log web, IoT dll.</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Analisis</td>
+                                <td class="py-3.5 px-5 text-slate-300">Analisis asas/deskriptif</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Analitik lanjutan: ramalan, pembelajaran mesin</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Tujuan</td>
+                                <td class="py-3.5 px-5 text-slate-300">Operasi harian / laporan biasa</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Keputusan strategik / automasi / inovasi</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Infrastruktur</td>
+                                <td class="py-3.5 px-5 text-slate-300">Pelayan biasa / relational DBMS</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Platform besar: Hadoop, Spark, Cloud, Data Lake</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-3.5 px-5 font-bold text-white">Kos Pemprosesan</td>
+                                <td class="py-3.5 px-5 text-slate-300">Lebih rendah, infrastruktur kecil</td>
+                                <td class="py-3.5 px-5 text-cyan-200 font-medium">Lebih tinggi, tetapi lebih nilai/keuntungan</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.6 Contoh Data Raya dalam Kehidupan Seharian (5 Kad) -->
+        <section id="bab-1-6" data-nav-section data-nav-title="Bab 1.6: Data Raya dalam Kehidupan Seharian" class="reveal">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-400/30 font-mono text-sm font-bold text-cyan-300">1.6</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">Contoh Data Raya dalam Kehidupan Seharian</h3>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 font-mono text-xs">01</span>
+                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+                    </div>
+                    <h4 class="font-display font-bold text-white text-base mb-2">Media Sosial</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Mengumpul data minat, likes, komen dan tontonan video untuk mencadangkan kandungan yang sesuai dengan minat pengguna.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-sky-500/15 text-sky-300 font-mono text-xs">02</span>
+                        <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <h4 class="font-display font-bold text-white text-base mb-2">Aplikasi Navigasi</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Menggunakan data lokasi daripada jutaan pengguna untuk memberi laluan terbaik, maklumat trafik dan masa perjalanan yang tepat.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 font-mono text-xs">03</span>
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    </div>
+                    <h4 class="font-display font-bold text-white text-base mb-2">E-Dagang</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Mengumpul data pembelian, carian produk dan sejarah pelanggan untuk cadangan produk dan promosi bersesuaian.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 font-mono text-xs">04</span>
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h4 class="font-display font-bold text-white text-base mb-2">Penstriman</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Data tontonan atau lagu yang dimainkan dianalisis untuk mencadangkan filem atau lagu yang mungkin disukai pengguna.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-lg bg-purple-500/15 text-purple-300 font-mono text-xs">05</span>
+                        <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h4 class="font-display font-bold text-white text-base mb-2">Perbankan Dalam Talian</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Menggunakan data transaksi untuk mengesan aktiviti mencurigakan dan meningkatkan keselamatan akaun.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.7 Analisis Data Raya & Kepentingan Pelbagai Sektor -->
+        <section id="bab-1-7" data-nav-section data-nav-title="Bab 1.7: Analisis Data Raya & Sektor" class="reveal">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-400/30 font-mono text-sm font-bold text-cyan-300">1.7</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">Analisis Data Raya &amp; Kepentingan Pelbagai Sektor</h3>
+            </div>
+
+            <!-- Definisi Analisis Data Raya -->
+            <div class="glass-card spotlight-card rounded-3xl p-6 sm:p-8 mb-6 border-l-4 border-l-cyan-400">
+                <div class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2">Definisi Analisis Data Raya</div>
+                <p class="text-slate-100 text-base sm:text-lg leading-relaxed">
+                    Proses menganalisis data dalam jumlah yang sangat besar, kompleks, dan pelbagai (Big Data) untuk mendapatkan corak, trend, dan maklumat berharga daripada pelbagai sumber seperti media sosial, transaksi perniagaan, sensor, atau peranti pintar.
+                </p>
+            </div>
+
+            <!-- Kepentingan dalam 10 Sektor -->
+            <div class="glass-card spotlight-card rounded-3xl p-6">
+                <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-3">Kepentingan dalam 10 Sektor Utama</div>
+                <div class="flex flex-wrap gap-2.5">
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">1. Perbankan</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">2. Komunikasi</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">3. Kesihatan</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">4. Pendidikan</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">5. Pembuatan</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">6. Tenaga dan Utiliti</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">7. Pengangkutan</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">8. Peruncitan</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">9. Insurans</span>
+                    <span class="px-4 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-sm font-medium text-white transition">10. Kerajaan</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- PEMBAHAGI PARALLAX BAB 2                                              -->
+    <!-- ===================================================================== -->
+    <div id="bab-2" class="chapter-banner chapter-beam py-16 sm:py-24">
+        <div data-parallax-speed="0.16" class="absolute inset-0 library-grid-bg opacity-45 pointer-events-none"></div>
+        <div data-parallax-speed="-0.12" class="absolute -left-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-sky-500/15 blur-[95px] pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div class="reveal max-w-3xl">
+                <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 font-mono text-xs sm:text-sm font-bold tracking-widest mb-4">
+                    <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                    BAB 2
+                </span>
+                <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.18]">
+                    EKOSISTEM DATA DALAM PERPUSTAKAAN
+                </h2>
+                <p class="text-slate-300 mt-4 text-base sm:text-lg leading-relaxed max-w-2xl">
+                    Peranan analitik data dalam operasi perpustakaan serta 7 kategori utama data perpustakaan.
+                </p>
+            </div>
+            <div class="relative flex items-center justify-center shrink-0 self-end md:self-center">
+                <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full border border-dashed border-sky-400/30 animate-orbit-slow absolute"></div>
+                <div class="font-display text-7xl sm:text-8xl font-extrabold chapter-numeral-stroke select-none leading-none">
+                    02
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- BAB 2: KANDUNGAN                                                      -->
+    <!-- ===================================================================== -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+        <!-- 2.1 Analisis Data Raya dalam Sektor Perpustakaan (6 Teras) -->
+        <section id="bab-2-1" data-nav-section data-nav-title="Bab 2.1: Analisis Data dalam Perpustakaan" class="reveal">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="px-3 py-1 rounded-lg bg-sky-500/15 border border-sky-400/30 font-mono text-sm font-bold text-sky-300">2.1</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">Analisis Data Raya dalam Sektor Perpustakaan</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-6 border-t-4 border-t-cyan-400">
+                    <span class="font-mono text-xs font-bold text-cyan-400">TERAS 01</span>
+                    <h4 class="font-display text-lg font-bold text-white mt-1 mb-2">Pemahaman Tingkah Laku Pengguna</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Menganalisis rekod pinjaman, carian OPAC dan waktu kunjungan untuk tahu minat serta keperluan pengguna.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-6 border-t-4 border-t-sky-400">
+                    <span class="font-mono text-xs font-bold text-sky-400">TERAS 02</span>
+                    <h4 class="font-display text-lg font-bold text-white mt-1 mb-2">Pemilihan dan Pembangunan Koleksi</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Menggunakan data pinjaman dan permintaan bahan supaya pembelian buku lebih tepat dan mengelakkan pembaziran bajet.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-6 border-t-4 border-t-amber-400">
+                    <span class="font-mono text-xs font-bold text-amber-400">TERAS 03</span>
+                    <h4 class="font-display text-lg font-bold text-white mt-1 mb-2">Pengurusan Ruang dan Kemudahan</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Memantau penggunaan ruang bacaan, komputer dan bilik diskusi untuk mengurus kapasiti dengan lebih baik.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-6 border-t-4 border-t-emerald-400">
+                    <span class="font-mono text-xs font-bold text-emerald-400">TERAS 04</span>
+                    <h4 class="font-display text-lg font-bold text-white mt-1 mb-2">Perancangan Program dan Aktiviti</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Merujuk data penyertaan dan maklum balas bagi memilih topik dan masa program yang paling diminati.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-6 border-t-4 border-t-purple-400">
+                    <span class="font-mono text-xs font-bold text-purple-300">TERAS 05</span>
+                    <h4 class="font-display text-lg font-bold text-white mt-1 mb-2">Peningkatan Perkhidmatan Digital</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Menyemak log akses e-book dan jurnal dalam talian untuk mengenal pasti platform popular dan waktu capaian tertinggi.
+                    </p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-6 border-t-4 border-t-rose-400">
+                    <span class="font-mono text-xs font-bold text-rose-300">TERAS 06</span>
+                    <h4 class="font-display text-lg font-bold text-white mt-1 mb-2">Penanda Aras dan Pelaporan Prestasi</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Menggunakan data analitik untuk penyediaan laporan KPI serta perbandingan prestasi antara cawangan.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.2 Jenis Data Perpustakaan (7 Kategori & Panel Interaktif) -->
+        <section id="bab-2-2" data-nav-section data-nav-title="Bab 2.2: Jenis Data Perpustakaan" class="reveal">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-sky-500/15 border border-sky-400/30 font-mono text-sm font-bold text-sky-300">2.2</span>
+                    <h3 class="font-display text-2xl sm:text-3xl font-bold text-white">Jenis Data Perpustakaan (7 Kategori)</h3>
+                </div>
+                <span class="text-xs font-mono text-cyan-300">Klik mana-mana kad di bawah untuk perincian</span>
+            </div>
+
+            <!-- Gambaran Keseluruhan 7 Jenis Data (Boleh Diklik) -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8">
+                <button type="button" data-lib-tab="0" class="lib-data-card active text-left p-4 rounded-2xl border transition bg-cyan-500/20 border-cyan-400 shadow-lg">
+                    <span class="font-mono text-xs font-bold text-cyan-300">01</span>
+                    <h4 class="font-display font-bold text-white text-base mt-0.5">Keahlian</h4>
+                    <p class="text-xs text-slate-200 mt-1">Individu yang mendaftar sebagai ahli perpustakaan.</p>
+                </button>
+
+                <button type="button" data-lib-tab="1" class="lib-data-card text-left p-4 rounded-2xl border transition glass-card border-white/10 hover:border-cyan-400/40">
+                    <span class="font-mono text-xs font-bold text-sky-400">02</span>
+                    <h4 class="font-display font-bold text-white text-base mt-0.5">Pengguna</h4>
+                    <p class="text-xs text-slate-300 mt-1">Individu yang menggunakan kemudahan dan perkhidmatan seperti pinjaman dan rujukan.</p>
+                </button>
+
+                <button type="button" data-lib-tab="2" class="lib-data-card text-left p-4 rounded-2xl border transition glass-card border-white/10 hover:border-cyan-400/40">
+                    <span class="font-mono text-xs font-bold text-amber-400">03</span>
+                    <h4 class="font-display font-bold text-white text-base mt-0.5">Pengunjung</h4>
+                    <p class="text-xs text-slate-300 mt-1">Individu yang hadir ke ruang perpustakaan.</p>
+                </button>
+
+                <button type="button" data-lib-tab="3" class="lib-data-card text-left p-4 rounded-2xl border transition glass-card border-white/10 hover:border-cyan-400/40">
+                    <span class="font-mono text-xs font-bold text-emerald-400">04</span>
+                    <h4 class="font-display font-bold text-white text-base mt-0.5">Bahan Dirujuk</h4>
+                    <p class="text-xs text-slate-300 mt-1">Bahan yang dirujuk di dalam perpustakaan seperti buku, majalah dan surat khabar.</p>
+                </button>
+
+                <button type="button" data-lib-tab="4" class="lib-data-card text-left p-4 rounded-2xl border transition glass-card border-white/10 hover:border-cyan-400/40">
+                    <span class="font-mono text-xs font-bold text-purple-300">05</span>
+                    <h4 class="font-display font-bold text-white text-base mt-0.5">Penggunaan ICT</h4>
+                    <p class="text-xs text-slate-300 mt-1">Individu yang menggunakan peralatan atau perkhidmatan ICT.</p>
+                </button>
+
+                <button type="button" data-lib-tab="5" class="lib-data-card text-left p-4 rounded-2xl border transition glass-card border-white/10 hover:border-cyan-400/40">
+                    <span class="font-mono text-xs font-bold text-rose-300">06</span>
+                    <h4 class="font-display font-bold text-white text-base mt-0.5">Peminjaman</h4>
+                    <p class="text-xs text-slate-300 mt-1">Rekod peminjaman bahan bacaan dari perpustakaan.</p>
+                </button>
+
+                <button type="button" data-lib-tab="6" class="lib-data-card text-left p-4 rounded-2xl border transition glass-card border-white/10 hover:border-cyan-400/40 sm:col-span-2">
+                    <span class="font-mono text-xs font-bold text-amber-300">07</span>
+                    <h4 class="font-display font-bold text-white text-base mt-0.5">Aktiviti/Program &amp; Peserta</h4>
+                    <p class="text-xs text-slate-300 mt-1">Program anjuran perpustakaan atau kerjasama luar serta kehadiran peserta.</p>
+                </button>
+            </div>
+
+            <!-- Panel Perincian Mendalam Jenis Data Terpilih -->
+            <div id="lib-detail-panel" class="glass-card-elevated rounded-3xl p-6 sm:p-8 border border-cyan-400/35">
+                <!-- Kandungan diisi secara dinamik oleh JS untuk kesemua 7 jenis data -->
+            </div>
+        </section>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- PEMBAHAGI PARALLAX BAB 3                                              -->
+    <!-- ===================================================================== -->
+    <div id="bab-3" class="chapter-banner chapter-beam py-16 sm:py-24">
+        <div data-parallax-speed="0.16" class="absolute inset-0 library-grid-bg opacity-45 pointer-events-none"></div>
+        <div data-parallax-speed="-0.12" class="absolute -left-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-emerald-500/15 blur-[95px] pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div class="reveal max-w-3xl">
+                <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-mono text-xs sm:text-sm font-bold tracking-widest mb-4">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    BAB 3
+                </span>
+                <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.18]">
+                    STRATEGI PEMBUDAYAAN &amp; PELAKSANAAN BDA
+                </h2>
+                <p class="text-slate-300 mt-4 text-base sm:text-lg leading-relaxed max-w-2xl">
+                    Langkah praktikal membudayakan data di perpustakaan, aliran penghasilan dashboard dan demo dataset.
+                </p>
+            </div>
+            <div class="relative flex items-center justify-center shrink-0 self-end md:self-center">
+                <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full border border-dashed border-emerald-400/30 animate-orbit-slow absolute"></div>
+                <div class="font-display text-7xl sm:text-8xl font-extrabold chapter-numeral-stroke select-none leading-none">
+                    03
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- BAB 3: KANDUNGAN                                                      -->
+    <!-- ===================================================================== -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+        <!-- 3.1 7 Strategi Pembudayaan BDA ("Apa yang kita perlu buat?") -->
+        <section id="bab-3-1" data-nav-section data-nav-title="Bab 3.1: 7 Strategi Pembudayaan BDA" class="reveal">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30 font-mono text-sm font-bold text-emerald-300">3.1</span>
+                    <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">7 Strategi Pembudayaan BDA <span class="text-amber-300 text-lg sm:text-2xl font-semibold">(“Apa yang kita perlu buat?”)</span></h3>
+                </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-l-4 border-l-cyan-400">
+                    <span class="font-mono text-xs font-bold text-cyan-400">01</span>
+                    <h4 class="font-display font-bold text-white text-base mt-1 mb-2">Kesedaran dan Pendidikan Data</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Beri pendedahan dan latihan asas kepada staf tentang kepentingan data dalam kerja harian.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-l-4 border-l-sky-400">
+                    <span class="font-mono text-xs font-bold text-sky-400">02</span>
+                    <h4 class="font-display font-bold text-white text-base mt-1 mb-2">Perubahan Pemikiran</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Pupuk budaya membuat keputusan berdasarkan fakta dan data, bukan sekadar andaian.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-l-4 border-l-amber-400">
+                    <span class="font-mono text-xs font-bold text-amber-400">03</span>
+                    <h4 class="font-display font-bold text-white text-base mt-1 mb-2">Pembinaan Infrastruktur &amp; Sistem Sokongan</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Sediakan sistem pengumpulan dan penyimpanan data yang teratur serta mudah digunakan.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-l-4 border-l-emerald-400">
+                    <span class="font-mono text-xs font-bold text-emerald-400">04</span>
+                    <h4 class="font-display font-bold text-white text-base mt-1 mb-2">Polisi &amp; SOP Berkaitan Data</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Wujudkan garis panduan jelas tentang pengurusan, keselamatan dan perkongsian data.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-l-4 border-l-purple-400">
+                    <span class="font-mono text-xs font-bold text-purple-300">05</span>
+                    <h4 class="font-display font-bold text-white text-base mt-1 mb-2">Integrasi Dalam Kerja Harian</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Jadikan semakan dan analisis data sebagai rutin dalam setiap unit perpustakaan.</p>
+                </div>
+
+                <div class="glass-card spotlight-card glass-hover rounded-2xl p-5 border-l-4 border-l-rose-400">
+                    <span class="font-mono text-xs font-bold text-rose-300">06</span>
+                    <h4 class="font-display font-bold text-white text-base mt-1 mb-2">Kolaborasi</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Galakkan kerjasama dan perkongsian maklumat antara unit serta komuniti data perpustakaan.</p>
+                </div>
+
+                <div class="glass-card-elevated spotlight-card glass-hover rounded-2xl p-5 border-l-4 border-l-amber-400 sm:col-span-2">
+                    <span class="font-mono text-xs font-bold text-amber-300">07</span>
+                    <h4 class="font-display font-bold text-white text-base mt-1 mb-2">Mulakan Kecil, Ukur, Kembangkan</h4>
+                    <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">Mulakan dengan projek rintis berskala kecil, nilai keberkesanannya, dan kembangkan secara berperingkat.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3.2 8 Langkah Pelaksanaan Analisis Data Raya (Carta Alir Interaktif) -->
+        <section id="bab-3-2" data-nav-section data-nav-title="Bab 3.2: 8 Langkah Pelaksanaan BDA" class="reveal">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30 font-mono text-sm font-bold text-emerald-300">3.2</span>
+                    <h3 class="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">8 Langkah Pelaksanaan Analisis Data Raya</h3>
+                </div>
+                <span class="text-xs font-mono text-emerald-300">Klik langkah untuk sorotan kemajuan</span>
+            </div>
+
+            <div id="roadmap-steps-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button type="button" data-step-idx="0" class="roadmap-step-card active text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5 border-cyan-400/60 bg-cyan-500/10">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-cyan-400 text-slate-950 font-mono font-bold flex items-center justify-center shrink-0 transition">1</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1.5 leading-snug">Kenal Pasti Keperluan &amp; Objektif</h4>
+                </button>
+
+                <button type="button" data-step-idx="1" class="roadmap-step-card text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-mono font-bold flex items-center justify-center shrink-0 transition">2</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1.5 leading-snug">Audit &amp; Kenal Pasti Sumber Data</h4>
+                </button>
+
+                <button type="button" data-step-idx="2" class="roadmap-step-card text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0 transition">3</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1.5 leading-snug">Bangunkan Infrastruktur Teknologi</h4>
+                </button>
+
+                <button type="button" data-step-idx="3" class="roadmap-step-card text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-300 font-mono font-bold flex items-center justify-center shrink-0 transition">4</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1.5 leading-snug">Pembersihan &amp; Penyediaan Data</h4>
+                </button>
+
+                <button type="button" data-step-idx="4" class="roadmap-step-card text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 font-mono font-bold flex items-center justify-center shrink-0 transition">5</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1.5 leading-snug">Analisis Data</h4>
+                </button>
+
+                <button type="button" data-step-idx="5" class="roadmap-step-card text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 font-mono font-bold flex items-center justify-center shrink-0 transition">6</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1.5 leading-snug">Bangunkan Dashboard &amp; Visualisasi</h4>
+                </button>
+
+                <button type="button" data-step-idx="6" class="roadmap-step-card text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-mono font-bold flex items-center justify-center shrink-0 transition">7</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1.5 leading-snug">Latihan &amp; Pembangunan Kepakaran</h4>
+                </button>
+
+                <button type="button" data-step-idx="7" class="roadmap-step-card text-left glass-card spotlight-card glass-hover rounded-2xl p-5 flex items-start gap-3.5">
+                    <span class="step-badge w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-mono font-bold flex items-center justify-center shrink-0 transition">8</span>
+                    <h4 class="font-display font-bold text-white text-sm sm:text-base pt-1 leading-snug">Tadbir Urus Data (<em>Data Governance</em>) &amp; Pemantauan dan Penambahbaikan</h4>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3.3 Pelaksanaan BDA Bahagian Penyelidikan, Penghasilan Dashboard & Demo Dataset -->
+        <section id="bab-3-3" data-nav-section data-nav-title="Bab 3.3: Penghasilan Dashboard & Contoh Dataset" class="reveal space-y-8">
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30 font-mono text-sm font-bold text-emerald-300">3.3</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-bold text-white">Pelaksanaan BDA Bahagian Penyelidikan &amp; Penghasilan Dashboard</h3>
+            </div>
+
+            <!-- Aliran Penghasilan Dashboard -->
+            <div class="glass-card-elevated rounded-3xl p-6 sm:p-8">
+                <div class="text-xs font-mono uppercase tracking-wider text-cyan-300 mb-4">Aliran Penghasilan Dashboard</div>
+                <div class="grid md:grid-cols-11 gap-4 items-center">
+                    <div class="md:col-span-5 p-5 rounded-2xl bg-slate-900/90 border border-emerald-400/30">
+                        <span class="text-xs font-mono uppercase text-emerald-400 block mb-2">Peringkat 1: Sumber Data</span>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/40 font-display font-bold text-white text-sm sm:text-base">
+                                Microsoft Excel
+                            </span>
+                            <span class="px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/40 font-display font-bold text-white text-sm sm:text-base">
+                                Google Sheet
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-1 flex justify-center">
+                        <span class="w-10 h-10 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 font-bold flex items-center justify-center rotate-90 md:rotate-0">➔</span>
+                    </div>
+
+                    <div class="md:col-span-5 p-5 rounded-2xl bg-slate-900/90 border border-amber-400/30">
+                        <span class="text-xs font-mono uppercase text-amber-400 block mb-2">Peringkat 2: Platform Visualisasi</span>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-2.5 rounded-xl bg-amber-500/20 border border-amber-400/40 font-display font-bold text-white text-sm sm:text-base">
+                                Power BI
+                            </span>
+                            <span class="px-4 py-2.5 rounded-xl bg-sky-500/20 border border-sky-400/40 font-display font-bold text-white text-sm sm:text-base">
+                                Looker Studio
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ruang Demo Interaktif: Contoh Dataset -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-cyan-400/30">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold">DEMO INTERAKTIF</span>
+                        <h4 class="font-display text-xl sm:text-2xl font-bold text-white mt-2">Contoh Dataset Perpustakaan</h4>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1">Tapis rekod mengikut tahun/kategori atau muat naik fail CSV semasa pembentangan.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label class="cursor-pointer px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-xs font-semibold text-cyan-200 transition">
+                            <span>Muat Naik CSV</span>
+                            <input type="file" id="csv-upload-input" accept=".csv" class="hidden">
+                        </label>
+                        <button type="button" id="download-sample-csv-btn" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-semibold text-slate-200 transition">
+                            Muat Turun Contoh CSV
+                        </button>
+                        <button type="button" id="reset-dataset-btn" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-400 hover:text-white transition">
+                            Set Semula
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Penapis & Ringkasan KPI Dataset -->
+                <div class="grid sm:grid-cols-4 gap-3 mb-5">
+                    <div>
+                        <label for="filter-year" class="block text-[11px] font-mono text-slate-400 mb-1">TAPIS TAHUN</label>
+                        <select id="filter-year" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/15 text-sm text-white focus:outline-none focus:border-cyan-400">
+                            <option value="ALL">Semua Tahun</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-category" class="block text-[11px] font-mono text-slate-400 mb-1">TAPIS KATEGORI</label>
+                        <select id="filter-category" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/15 text-sm text-white focus:outline-none focus:border-cyan-400">
+                            <option value="ALL">Semua Kategori</option>
+                        </select>
+                    </div>
+                    <div class="p-3 rounded-xl bg-cyan-950/50 border border-cyan-500/25 flex flex-col justify-center">
+                        <span class="text-[11px] font-mono text-cyan-300">JUMLAH REKOD DIPAPAR</span>
+                        <span id="dataset-row-count" class="font-mono text-lg font-bold text-white">0</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/25 flex flex-col justify-center">
+                        <span class="text-[11px] font-mono text-amber-300">JUMLAH TRANSAKSI</span>
+                        <span id="dataset-total-sum" class="font-mono text-lg font-bold text-amber-300">0</span>
+                    </div>
+                </div>
+
+                <!-- Jadual Dataset -->
+                <div class="overflow-x-auto rounded-2xl border border-white/10 max-h-80">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead id="dataset-thead" class="bg-blue-950/95 text-slate-200 font-mono sticky top-0">
+                            <!-- Dijana oleh JS -->
+                        </thead>
+                        <tbody id="dataset-tbody" class="divide-y divide-white/10 bg-slate-950/50">
+                            <!-- Dijana oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- PENUTUP RASMI: TERIMA KASIH                                           -->
+        <!-- ===================================================================== -->
+        <section id="penutup" data-nav-section data-nav-title="Penutup: Terima Kasih" class="reveal pt-6 pb-12">
+            <div class="glass-card-elevated rounded-[2rem] p-8 sm:p-14 text-center relative overflow-hidden border border-amber-400/35">
+                <div class="absolute inset-0 library-grid-bg opacity-35 pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl mx-auto">
+                    <span class="inline-block px-4 py-1.5 rounded-full bg-amber-400/15 border border-amber-400/35 text-amber-300 font-mono text-xs sm:text-sm tracking-widest uppercase mb-5">
+                        USM | Nibong Tebal
+                    </span>
+                    <h2 class="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-amber-300 mb-4">
+                        TERIMA KASIH
+                    </h2>
+                    <p class="text-slate-300 text-base sm:text-lg mb-8">
+                        Analisis Data: Ke Arah Membuat Keputusan Berdasarkan Data
+                    </p>
+                    <div class="inline-block px-6 py-4 rounded-2xl bg-slate-950/75 border border-white/15">
+                        <div class="font-display font-bold text-white text-lg">Nurul Aini bt Abdul Rahman</div>
+                        <div class="text-sm text-cyan-300 mt-0.5">Sesi Pembudayaan BDA 2026 | USM</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- JAVASCRIPT: PARALLAX, NAVIGASI PEMBENTANG, TAB, CARTA & DATASET       -->
+    <!-- ===================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // -----------------------------------------------------------------
+            // 1. NOTIFIKASI TOAST (Pengganti alert())
+            // -----------------------------------------------------------------
+            const toastEl = document.getElementById('toast-notification');
+            const toastMsgEl = document.getElementById('toast-message');
+            let toastTimer = null;
+
+            function showToast(message) {
+                toastMsgEl.textContent = message;
+                toastEl.classList.remove('hidden');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toastEl.classList.add('hidden');
+                }, 3800);
+            }
+
+            // -----------------------------------------------------------------
+            // 2. KAWALAN SAIZ TEKS (Butang Tunggal: Normal / Besar)
+            // -----------------------------------------------------------------
+            const textSizeBtn = document.getElementById('text-size-toggle-btn');
+            let isLargeText = false;
+
+            textSizeBtn.addEventListener('click', () => {
+                isLargeText = !isLargeText;
+                document.documentElement.classList.toggle('text-scale-large', isLargeText);
+                textSizeBtn.textContent = isLargeText ? 'Saiz Teks: Besar' : 'Saiz Teks: Normal';
+                textSizeBtn.classList.toggle('border-amber-400/60', isLargeText);
+                textSizeBtn.classList.toggle('text-amber-300', isLargeText);
+            });
+
+            // -----------------------------------------------------------------
+            // 3. KAWALAN FULLSCREEN (Fullscreen / Exit Fullscreen)
+            // -----------------------------------------------------------------
+            const fullscreenBtn = document.getElementById('fullscreen-toggle-btn');
+            const fullscreenLabel = document.getElementById('fullscreen-label');
+
+            function updateFullscreenUI() {
+                const isFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+                fullscreenLabel.textContent = isFs ? 'Exit Fullscreen' : 'Fullscreen';
+            }
+
+            fullscreenBtn.addEventListener('click', async () => {
+                try {
+                    const isFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+                    if (!isFs) {
+                        const docEl = document.documentElement;
+                        if (docEl.requestFullscreen) {
+                            await docEl.requestFullscreen();
+                        } else if (docEl.webkitRequestFullscreen) {
+                            await docEl.webkitRequestFullscreen();
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                            await document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            await document.webkitExitFullscreen();
+                        }
+                    }
+                } catch (err) {
+                    showToast('Mod skrin penuh disekat oleh pelayar/bingkai pratonton. Tekan F11 pada papan kekunci untuk skrin penuh.');
+                }
+            });
+
+            document.addEventListener('fullscreenchange', updateFullscreenUI);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+            // -----------------------------------------------------------------
+            // 4. NAVIGASI PEMBENTANG (Dropdown, Anak Panah & Papan Kekunci)
+            // -----------------------------------------------------------------
+            const sections = Array.from(document.querySelectorAll('section[data-nav-section]'));
+            const currentSectionLabel = document.getElementById('current-section-label');
+            const dropdownBtn = document.getElementById('section-dropdown-btn');
+            const dropdownMenu = document.getElementById('section-dropdown-menu');
+            const dropdownChevron = document.getElementById('dropdown-chevron');
+            const dropdownLinksContainer = document.getElementById('dropdown-links-container');
+            const prevBtn = document.getElementById('prev-section-btn');
+            const nextBtn = document.getElementById('next-section-btn');
+            let activeSectionIndex = 0;
+
+            // Bina pautan dalam menu dropdown secara dinamik
+            sections.forEach((sec, idx) => {
+                const title = sec.getAttribute('data-nav-title') || `Bahagian ${idx}`;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'dropdown-nav-item w-full text-left px-3 py-2 rounded-xl text-xs sm:text-sm text-slate-300 hover:bg-cyan-500/20 hover:text-white transition flex items-center justify-between gap-2';
+                btn.setAttribute('data-target-idx', idx);
+                btn.innerHTML = `<span class="truncate">${title}</span><span class="font-mono text-[10px] text-slate-500">#${idx + 1}</span>`;
+                btn.addEventListener('click', () => {
+                    jumpToSection(idx);
+                    closeDropdown();
+                });
+                dropdownLinksContainer.appendChild(btn);
+            });
+
+            function toggleDropdown() {
+                const isHidden = dropdownMenu.classList.contains('hidden');
+                dropdownMenu.classList.toggle('hidden', !isHidden);
+                dropdownBtn.setAttribute('aria-expanded', String(isHidden));
+                dropdownChevron.classList.toggle('rotate-180', isHidden);
+            }
+
+            function closeDropdown() {
+                dropdownMenu.classList.add('hidden');
+                dropdownBtn.setAttribute('aria-expanded', 'false');
+                dropdownChevron.classList.remove('rotate-180');
+            }
+
+            dropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdownMenu.contains(e.target) && !dropdownBtn.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+
+            function jumpToSection(index) {
+                const clamped = Math.max(0, Math.min(sections.length - 1, index));
+                activeSectionIndex = clamped;
+                sections[clamped].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                updateActiveNavUI(clamped);
+            }
+
+            function updateActiveNavUI(index) {
+                activeSectionIndex = index;
+                const title = sections[index].getAttribute('data-nav-title');
+                currentSectionLabel.textContent = title;
+
+                const items = dropdownLinksContainer.querySelectorAll('.dropdown-nav-item');
+                items.forEach((item, i) => {
+                    if (i === index) {
+                        item.classList.add('bg-cyan-500/25', 'text-cyan-200', 'font-semibold');
+                    } else {
+                        item.classList.remove('bg-cyan-500/25', 'text-cyan-200', 'font-semibold');
+                    }
+                });
+            }
+
+            prevBtn.addEventListener('click', () => jumpToSection(activeSectionIndex - 1));
+            nextBtn.addEventListener('click', () => jumpToSection(activeSectionIndex + 1));
+
+            // Sokongan papan kekunci (ArrowUp / ArrowDown / PageUp / PageDown)
+            document.addEventListener('keydown', (e) => {
+                const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+                if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+
+                if (e.key === 'PageDown' || (e.key === 'ArrowDown' && (e.ctrlKey || e.metaKey || e.altKey))) {
+                    e.preventDefault();
+                    jumpToSection(activeSectionIndex + 1);
+                } else if (e.key === 'PageUp' || (e.key === 'ArrowUp' && (e.ctrlKey || e.metaKey || e.altKey))) {
+                    e.preventDefault();
+                    jumpToSection(activeSectionIndex - 1);
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    jumpToSection(activeSectionIndex + 1);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    jumpToSection(activeSectionIndex - 1);
+                }
+            });
+
+            // -----------------------------------------------------------------
+            // 5. PARALLAX SCROLL, PROGRESS BAR & SCROLL REVEAL
+            // -----------------------------------------------------------------
+            const progressBar = document.getElementById('scroll-progress-bar');
+            const parallaxLayers = document.querySelectorAll('[data-parallax-speed]');
+
+            function handleScroll() {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                progressBar.style.width = `${Math.min(100, Math.max(0, scrollPercent))}%`;
+
+                // Kesan Parallax pada lapisan latar
+                parallaxLayers.forEach(layer => {
+                    const speed = parseFloat(layer.getAttribute('data-parallax-speed')) || 0.15;
+                    const rect = layer.parentElement.getBoundingClientRect();
+                    const offset = rect.top * speed;
+                    layer.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
+                });
+
+                // Kemas kini bahagian aktif semasa skrol
+                const triggerPoint = window.innerHeight * 0.35;
+                let currentIdx = 0;
+                sections.forEach((sec, idx) => {
+                    const rect = sec.getBoundingClientRect();
+                    if (rect.top <= triggerPoint) {
+                        currentIdx = idx;
+                    }
+                });
+                if (currentIdx !== activeSectionIndex) {
+                    updateActiveNavUI(currentIdx);
+                }
+            }
+
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll();
+
+            // IntersectionObserver untuk animasi kemunculan kad
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+            // -----------------------------------------------------------------
+            // 6. TAB INTERAKTIF BAB 1.2 (KLASIFIKASI DATA)
+            // -----------------------------------------------------------------
+            const klasifikasiTabBtns = document.querySelectorAll('.klasifikasi-tab-btn');
+            const klasifikasiPanels = document.querySelectorAll('.klasifikasi-panel');
+
+            klasifikasiTabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-tab-target');
+
+                    klasifikasiTabBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-cyan-500/20', 'border-cyan-400', 'text-white', 'shadow-lg');
+                        b.classList.add('bg-white/5', 'border-white/10', 'text-slate-300');
+                    });
+
+                    btn.classList.add('active', 'bg-cyan-500/20', 'border-cyan-400', 'text-white', 'shadow-lg');
+                    btn.classList.remove('bg-white/5', 'border-white/10', 'text-slate-300');
+
+                    klasifikasiPanels.forEach(panel => {
+                        const isTarget = panel.id === targetId;
+                        panel.classList.toggle('hidden', !isTarget);
+                        if (isTarget) {
+                            panel.classList.remove('animate-panel-in');
+                            void panel.offsetWidth;
+                            panel.classList.add('animate-panel-in');
+                        }
+                    });
+                });
+            });
+
+            // -----------------------------------------------------------------
+            // 6B. KESAN SOROTAN KURSOR (SPOTLIGHT) & INTERAKSI LANGKAH 3.2
+            // -----------------------------------------------------------------
+            document.addEventListener('pointermove', (e) => {
+                const cards = document.querySelectorAll('.spotlight-card');
+                cards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    if (
+                        e.clientX >= rect.left - 40 &&
+                        e.clientX <= rect.right + 40 &&
+                        e.clientY >= rect.top - 40 &&
+                        e.clientY <= rect.bottom + 40
+                    ) {
+                        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                    }
+                });
+            }, { passive: true });
+
+            const roadmapCards = document.querySelectorAll('.roadmap-step-card');
+            roadmapCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const selectedIdx = parseInt(card.getAttribute('data-step-idx'), 10);
+                    roadmapCards.forEach((c, idx) => {
+                        const badge = c.querySelector('.step-badge');
+                        if (idx <= selectedIdx) {
+                            c.classList.add('border-cyan-400/60', 'bg-cyan-500/10');
+                            badge.className = 'step-badge w-9 h-9 rounded-xl bg-cyan-400 text-slate-950 font-mono font-bold flex items-center justify-center shrink-0 transition shadow-md';
+                        } else {
+                            c.classList.remove('border-cyan-400/60', 'bg-cyan-500/10');
+                            badge.className = 'step-badge w-9 h-9 rounded-xl bg-white/10 border border-white/20 text-slate-300 font-mono font-bold flex items-center justify-center shrink-0 transition';
+                        }
+                    });
+                });
+            });
+
+            // -----------------------------------------------------------------
+            // 7. PANEL INTERAKTIF BAB 2.2 (7 JENIS DATA PERPUSTAKAAN)
+            // -----------------------------------------------------------------
+            const libraryDataDetails = [
+                {
+                    num: '01',
+                    title: 'Data Keahlian',
+                    subtitle: 'Individu yang mendaftar sebagai ahli perpustakaan.',
+                    collected: [
+                        'Data demografi ahli: Jantina, Bangsa, Umur, Pekerjaan dan Lokasi.'
+                    ],
+                    uses: [
+                        'Memahami profil pengguna perpustakaan.',
+                        'Merancang program bersesuaian (seperti kelas literasi maklumat atau bengkel penyelidikan).',
+                        'Menganalisis corak pinjaman mengikut kumpulan ahli dan mengurus sumber dengan berkesan.'
+                    ]
+                },
+                {
+                    num: '02',
+                    title: 'Data Pengguna',
+                    subtitle: 'Individu yang menggunakan kemudahan dan perkhidmatan seperti pinjaman dan rujukan.',
+                    collected: [
+                        'Kemudahan yang digunakan: Karel, Bilik Mesyuarat, Bilik Bacaan dan Ruang Surat Khabar.'
+                    ],
+                    uses: [
+                        'Melihat corak penggunaan kemudahan perpustakaan.',
+                        'Meningkatkan kualiti perkhidmatan pengguna.',
+                        'Menyokong perancangan strategik dan pengurusan sumber.'
+                    ]
+                },
+                {
+                    num: '03',
+                    title: 'Data Pengunjung',
+                    subtitle: 'Individu yang hadir ke ruang perpustakaan.',
+                    collected: [
+                        'Kategori pengunjung: Pengunjung biasa, Lawatan rasmi, Lawatan berpandu dan Mesyuarat.',
+                        'Maklumat kunjungan: Jumlah pengunjung, Tarikh & Waktu, Tempoh dan Lokasi.'
+                    ],
+                    uses: [
+                        'Mengenal pasti waktu puncak kehadiran pengunjung.',
+                        'Merancang kapasiti bilik, komputer dan ruang bacaan.',
+                        'Mengatur jadual program dan meningkatkan mutu perkhidmatan.'
+                    ]
+                },
+                {
+                    num: '04',
+                    title: 'Data Bahan Dirujuk',
+                    subtitle: 'Bahan yang dirujuk di dalam perpustakaan seperti buku, majalah dan surat khabar.',
+                    collected: [
+                        'Maklumat bahan: Pengguna, Tajuk, Kategori dan Lokasi.',
+                        'Corak rujukan: Bilangan rujukan harian/bulanan, Tempoh rujukan dan Bahan paling kerap dirujuk.'
+                    ],
+                    uses: [
+                        'Memahami minat dan keperluan bacaan pengguna.',
+                        'Merancang pembelian koleksi baharu dan menyusun kedudukan rak.',
+                        'Analisis strategik dengan menggabungkan data rujukan, pinjaman dan lawatan.'
+                    ]
+                },
+                {
+                    num: '05',
+                    title: 'Data Penggunaan ICT',
+                    subtitle: 'Individu yang menggunakan peralatan atau perkhidmatan ICT.',
+                    collected: [
+                        'Jenis peralatan/perkhidmatan: Komputer, Tablet, Wi-Fi, Pencetak, Pengimbas dan Perisian.',
+                        'Corak penggunaan: Kekerapan penggunaan, Tempoh dan Aktiviti utama (pembacaan digital, penyelidikan, cetakan dokumen).'
+                    ],
+                    uses: [
+                        'Memahami keperluan teknologi pengguna perpustakaan.',
+                        'Merancang naik taraf kemudahan dan infrastruktur ICT.',
+                        'Menganjurkan bengkel literasi digital, pangkalan data dan tutorial e-book.'
+                    ]
+                },
+                {
+                    num: '06',
+                    title: 'Data Peminjaman',
+                    subtitle: 'Rekod peminjaman bahan bacaan dari perpustakaan.',
+                    collected: [
+                        'Maklumat pengguna dan maklumat bahan (Tajuk, Kategori, Lokasi, Bahasa, Subjek).',
+                        'Corak pinjaman: Bilangan, Tempoh dan Kekerapan pinjaman.'
+                    ],
+                    uses: [
+                        'Pemilihan dan pembangunan koleksi baharu.',
+                        'Pengurusan stok rak dan infrastruktur peminjaman.',
+                        'Merancang aktiviti promosi koleksi seperti kelab buku.'
+                    ]
+                },
+                {
+                    num: '07',
+                    title: 'Data Aktiviti/Program & Peserta',
+                    subtitle: 'Program anjuran perpustakaan atau kerjasama luar serta kehadiran peserta.',
+                    collected: [
+                        'Jenis program: Program dalaman perpustakaan atau kerjasama bersama pihak luar.',
+                        'Rekod penyertaan: Jumlah kehadiran khalayak dan maklum balas peserta sepanjang program.'
+                    ],
+                    uses: [
+                        'Menilai tahap sambutan khalayak terhadap setiap aktiviti.',
+                        'Merancang tema dan masa pelaksanaan program yang paling diminati pada masa hadapan.'
+                    ]
+                }
+            ];
+
+            const libDetailPanel = document.getElementById('lib-detail-panel');
+            const libCards = document.querySelectorAll('.lib-data-card');
+
+            function renderLibDetail(idx) {
+                const item = libraryDataDetails[idx];
+                libDetailPanel.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-white/10">
+                        <div>
+                            <span class="font-mono text-xs font-bold text-cyan-400">PERINCIAN DATA ${item.num}</span>
+                            <h4 class="font-display text-xl sm:text-2xl font-bold text-white mt-0.5">${item.title}</h4>
+                            <p class="text-sm text-slate-300 mt-1">${item.subtitle}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-xl bg-cyan-500/15 border border-cyan-400/30 font-mono text-xs text-cyan-200">
+                            ${idx + 1} / 7 Kategori
+                        </span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="p-5 rounded-2xl bg-slate-900/80 border border-white/10">
+                            <span class="text-xs font-mono uppercase tracking-wider text-amber-300 block mb-3">Maklumat Yang Direkodkan</span>
+                            <ul class="space-y-2 text-sm text-slate-200 leading-relaxed">
+                                ${item.collected.map(c => `<li class="flex items-start gap-2.5"><span class="text-amber-400 font-bold">•</span><span>${c}</span></li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-cyan-950/40 border border-cyan-500/25">
+                            <span class="text-xs font-mono uppercase tracking-wider text-cyan-300 block mb-3">Kegunaan Utama</span>
+                            <ul class="space-y-2 text-sm text-slate-100 leading-relaxed">
+                                ${item.uses.map(u => `<li class="flex items-start gap-2.5"><span class="text-cyan-400 font-bold">✓</span><span>${u}</span></li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            libCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const idx = parseInt(card.getAttribute('data-lib-tab'), 10);
+                    libCards.forEach(c => {
+                        c.classList.remove('active', 'bg-cyan-500/20', 'border-cyan-400', 'shadow-lg');
+                        c.classList.add('glass-card', 'border-white/10');
+                    });
+                    card.classList.add('active', 'bg-cyan-500/20', 'border-cyan-400', 'shadow-lg');
+                    card.classList.remove('glass-card', 'border-white/10');
+                    libDetailPanel.classList.remove('animate-panel-in');
+                    void libDetailPanel.offsetWidth;
+                    libDetailPanel.classList.add('animate-panel-in');
+                    renderLibDetail(idx);
+                });
+            });
+
+            renderLibDetail(0);
+
+            // -----------------------------------------------------------------
+            // 8. RUANG DEMO INTERAKTIF: CONTOH DATASET & MUAT NAIK CSV
+            // -----------------------------------------------------------------
+            const defaultDataset = [
+                { Tahun: '2024', Kategori: 'Peminjaman', Perkhidmatan: 'Pinjaman Buku Fizikal', Jumlah_Transaksi: 277000, Status: 'Aktif' },
+                { Tahun: '2024', Kategori: 'Perkhidmatan Digital', Perkhidmatan: 'Akses E-Book & Jurnal', Jumlah_Transaksi: 190000, Status: 'Aktif' },
+                { Tahun: '2024', Kategori: 'Pengunjung', Perkhidmatan: 'Kehadiran Ruang Bacaan', Jumlah_Transaksi: 145200, Status: 'Meningkat' },
+                { Tahun: '2024', Kategori: 'Penggunaan ICT', Perkhidmatan: 'Penggunaan Komputer & Wi-Fi', Jumlah_Transaksi: 84300, Status: 'Stabil' },
+                { Tahun: '2025', Kategori: 'Peminjaman', Perkhidmatan: 'Pinjaman Buku Fizikal', Jumlah_Transaksi: 300000, Status: 'Meningkat' },
+                { Tahun: '2025', Kategori: 'Perkhidmatan Digital', Perkhidmatan: 'Akses E-Book & Jurnal', Jumlah_Transaksi: 170000, Status: 'Stabil' },
+                { Tahun: '2025', Kategori: 'Bahan Dirujuk', Perkhidmatan: 'Rujukan Tesis & Arkib', Jumlah_Transaksi: 62450, Status: 'Meningkat' },
+                { Tahun: '2025', Kategori: 'Aktiviti/Program', Perkhidmatan: 'Bengkel Literasi Maklumat', Jumlah_Transaksi: 12800, Status: 'Aktif' },
+                { Tahun: '2026', Kategori: 'Peminjaman', Perkhidmatan: 'Pinjaman Buku Fizikal', Jumlah_Transaksi: 330000, Status: 'Sasaran' },
+                { Tahun: '2026', Kategori: 'Perkhidmatan Digital', Perkhidmatan: 'Akses E-Book & Jurnal', Jumlah_Transaksi: 150000, Status: 'Sasaran' },
+                { Tahun: '2026', Kategori: 'Keahlian', Perkhidmatan: 'Pendaftaran Ahli Baharu', Jumlah_Transaksi: 18500, Status: 'Sasaran' },
+                { Tahun: '2026', Kategori: 'Pengguna', Perkhidmatan: 'Tempahan Bilik Karel & Diskusi', Jumlah_Transaksi: 29400, Status: 'Sasaran' }
+            ];
+
+            let currentDataset = [...defaultDataset];
+            let currentHeaders = Object.keys(defaultDataset[0]);
+
+            const filterYearSelect = document.getElementById('filter-year');
+            const filterCategorySelect = document.getElementById('filter-category');
+            const datasetRowCountEl = document.getElementById('dataset-row-count');
+            const datasetTotalSumEl = document.getElementById('dataset-total-sum');
+            const datasetThead = document.getElementById('dataset-thead');
+            const datasetTbody = document.getElementById('dataset-tbody');
+            const csvUploadInput = document.getElementById('csv-upload-input');
+            const downloadSampleCsvBtn = document.getElementById('download-sample-csv-btn');
+            const resetDatasetBtn = document.getElementById('reset-dataset-btn');
+
+            function populateDatasetFilters() {
+                const yearCol = currentHeaders.find(h => h.toLowerCase().includes('tahun')) || currentHeaders[0];
+                const catCol = currentHeaders.find(h => h.toLowerCase().includes('kategori')) || currentHeaders[1] || currentHeaders[0];
+
+                const years = Array.from(new Set(currentDataset.map(row => String(row[yearCol] || '').trim()).filter(Boolean)));
+                const categories = Array.from(new Set(currentDataset.map(row => String(row[catCol] || '').trim()).filter(Boolean)));
+
+                filterYearSelect.innerHTML = '<option value="ALL">Semua Tahun</option>' +
+                    years.map(y => `<option value="${y}">${y}</option>`).join('');
+
+                filterCategorySelect.innerHTML = '<option value="ALL">Semua Kategori</option>' +
+                    categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+
+            function renderDatasetTable() {
+                const selectedYear = filterYearSelect.value;
+                const selectedCategory = filterCategorySelect.value;
+
+                const yearCol = currentHeaders.find(h => h.toLowerCase().includes('tahun')) || currentHeaders[0];
+                const catCol = currentHeaders.find(h => h.toLowerCase().includes('kategori')) || currentHeaders[1] || currentHeaders[0];
+                const numericCol = currentHeaders.find(h =>
+                    h.toLowerCase().includes('jumlah') ||
+                    h.toLowerCase().includes('transaksi') ||
+                    h.toLowerCase().includes('bilangan') ||
+                    h.toLowerCase().includes('total')
+                ) || currentHeaders.find(h => currentDataset.some(r => !isNaN(parseFloat(String(r[h]).replace(/,/g, '')))));
+
+                const filteredRows = currentDataset.filter(row => {
+                    const matchYear = selectedYear === 'ALL' || String(row[yearCol] || '').trim() === selectedYear;
+                    const matchCat = selectedCategory === 'ALL' || String(row[catCol] || '').trim() === selectedCategory;
+                    return matchYear && matchCat;
+                });
+
+                // Render kepala jadual
+                datasetThead.innerHTML = `
+                    <tr>
+                        ${currentHeaders.map(h => `<th class="py-3 px-4 text-left uppercase tracking-wider text-xs border-b border-white/10">${h.replace(/_/g, ' ')}</th>`).join('')}
+                    </tr>
+                `;
+
+                // Render baris data
+                if (filteredRows.length === 0) {
+                    datasetTbody.innerHTML = `
+                        <tr>
+                            <td colspan="${currentHeaders.length}" class="py-6 px-4 text-center text-slate-400">
+                                Tiada rekod ditemui untuk pilihan penapis ini.
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    datasetTbody.innerHTML = filteredRows.map(row => `
+                        <tr class="hover:bg-white/5 transition">
+                            ${currentHeaders.map(h => {
+                                const val = row[h] !== undefined ? row[h] : '-';
+                                const numVal = Number(String(val).replace(/,/g, ''));
+                                const formatted = (!isNaN(numVal) && h === numericCol) ? numVal.toLocaleString('ms-MY') : val;
+                                return `<td class="py-3 px-4 text-slate-200 whitespace-nowrap">${formatted}</td>`;
+                            }).join('')}
+                        </tr>
+                    `).join('');
+                }
+
+                // Kira KPI ringkasan
+                datasetRowCountEl.textContent = filteredRows.length.toLocaleString('ms-MY');
+                const totalSum = filteredRows.reduce((acc, row) => {
+                    if (!numericCol) return acc;
+                    const parsed = parseFloat(String(row[numericCol] || '0').replace(/,/g, ''));
+                    return acc + (isNaN(parsed) ? 0 : parsed);
+                }, 0);
+                datasetTotalSumEl.textContent = Math.round(totalSum).toLocaleString('ms-MY');
+            }
+
+            filterYearSelect.addEventListener('change', renderDatasetTable);
+            filterCategorySelect.addEventListener('change', renderDatasetTable);
+
+            // Muat naik fail CSV pengguna
+            csvUploadInput.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const text = String(event.target.result || '').trim();
+                        const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+                        if (lines.length < 2) {
+                            showToast('Fail CSV mestilah mempunyai baris tajuk dan sekurang-kurangnya satu baris data.');
+                            return;
+                        }
+
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+                        const parsedRows = lines.slice(1).map(line => {
+                            const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                            const obj = {};
+                            headers.forEach((h, idx) => {
+                                obj[h] = values[idx] !== undefined ? values[idx] : '';
+                            });
+                            return obj;
+                        });
+
+                        currentHeaders = headers;
+                        currentDataset = parsedRows;
+                        populateDatasetFilters();
+                        renderDatasetTable();
+                        showToast(`Berjaya memuat naik ${parsedRows.length} rekod daripada "${file.name}".`);
+                    } catch (err) {
+                        showToast('Ralat membaca fail CSV. Pastikan format dipisahkan dengan koma (,).');
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // Muat turun contoh CSV
+            downloadSampleCsvBtn.addEventListener('click', () => {
+                const csvRows = [
+                    currentHeaders.join(','),
+                    ...currentDataset.map(row => currentHeaders.map(h => `"${String(row[h] ?? '').replace(/"/g, '""')}"`).join(','))
+                ];
+                const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Contoh_Dataset_Perpustakaan_BDA2026.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Fail contoh CSV berjaya dimuat turun.');
+            });
+
+            // Set semula dataset asal
+            resetDatasetBtn.addEventListener('click', () => {
+                currentDataset = [...defaultDataset];
+                currentHeaders = Object.keys(defaultDataset[0]);
+                csvUploadInput.value = '';
+                populateDatasetFilters();
+                renderDatasetTable();
+                showToast('Dataset telah ditetapkan semula kepada data contoh asal.');
+            });
+
+            populateDatasetFilters();
+            renderDatasetTable();
+
+            // -----------------------------------------------------------------
+            // 9. ANIMASI JARINGAN NOD DATA & PARTIKEL CAHAYA (GLOBAL CANVAS)
+            // -----------------------------------------------------------------
+            const canvas = document.getElementById('bg-constellation-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let width = 0;
+                let height = 0;
+                let particles = [];
+                let risingSparks = [];
+                const pointer = { x: -9999, y: -9999 };
+
+                window.addEventListener('pointermove', (e) => {
+                    pointer.x = e.clientX;
+                    pointer.y = e.clientY;
+                }, { passive: true });
+
+                window.addEventListener('pointerleave', () => {
+                    pointer.x = -9999;
+                    pointer.y = -9999;
+                });
+
+                function resizeCanvas() {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                }
+
+                function initParticles() {
+                    particles = [];
+                    risingSparks = [];
+                    const count = Math.min(68, Math.max(28, Math.floor((width * height) / 22000)));
+                    for (let i = 0; i < count; i++) {
+                        particles.push({
+                            x: Math.random() * width,
+                            y: Math.random() * height,
+                            vx: (Math.random() - 0.5) * 0.38,
+                            vy: (Math.random() - 0.5) * 0.38,
+                            radius: Math.random() * 2 + 1.1,
+                            isGold: i % 5 === 0,
+                            pulsePhase: Math.random() * Math.PI * 2
+                        });
+                    }
+
+                    const sparkCount = Math.min(24, Math.max(10, Math.floor(width / 65)));
+                    for (let i = 0; i < sparkCount; i++) {
+                        risingSparks.push({
+                            x: Math.random() * width,
+                            y: Math.random() * height,
+                            speedY: 0.25 + Math.random() * 0.55,
+                            size: 1 + Math.random() * 1.8,
+                            alpha: 0.2 + Math.random() * 0.45,
+                            isGold: i % 3 === 0
+                        });
+                    }
+                }
+
+                function animateParticles() {
+                    ctx.clearRect(0, 0, width, height);
+
+                    // 1. Zarah data naik perlahan (seperti aliran maklumat)
+                    for (let i = 0; i < risingSparks.length; i++) {
+                        const s = risingSparks[i];
+                        s.y -= s.speedY;
+                        if (s.y < -10) {
+                            s.y = height + 10;
+                            s.x = Math.random() * width;
+                        }
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                        ctx.fillStyle = s.isGold
+                            ? `rgba(250, 204, 21, ${s.alpha})`
+                            : `rgba(56, 189, 248, ${s.alpha})`;
+                        ctx.fill();
+                    }
+
+                    // 2. Jaringan nod konstelasi interaktif
+                    for (let i = 0; i < particles.length; i++) {
+                        const p = particles[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.pulsePhase += 0.03;
+
+                        if (p.x < 0 || p.x > width) p.vx *= -1;
+                        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                        // Sambungan antara nod berdekatan
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const p2 = particles[j];
+                            const dx = p.x - p2.x;
+                            const dy = p.y - p2.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+
+                            if (dist < 155) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = (p.isGold || p2.isGold)
+                                    ? `rgba(250, 204, 21, ${(1 - dist / 155) * 0.16})`
+                                    : `rgba(56, 189, 248, ${(1 - dist / 155) * 0.24})`;
+                                ctx.lineWidth = 1;
+                                ctx.moveTo(p.x, p.y);
+                                ctx.lineTo(p2.x, p2.y);
+                                ctx.stroke();
+                            }
+                        }
+
+                        // Sambungan lembut ke kursor pembentang
+                        const mdx = p.x - pointer.x;
+                        const mdy = p.y - pointer.y;
+                        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+                        if (mDist < 190) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(56, 189, 248, ${(1 - mDist / 190) * 0.38})`;
+                            ctx.lineWidth = 1.15;
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(pointer.x, pointer.y);
+                            ctx.stroke();
+                        }
+
+                        // Lukis titik nod bercahaya
+                        const glowRadius = p.radius + Math.sin(p.pulsePhase) * 0.45;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, Math.max(0.8, glowRadius), 0, Math.PI * 2);
+                        ctx.fillStyle = p.isGold ? 'rgba(250, 204, 21, 0.85)' : 'rgba(56, 189, 248, 0.85)';
+                        ctx.fill();
+                    }
+
+                    requestAnimationFrame(animateParticles);
+                }
+
+                window.addEventListener('resize', () => {
+                    resizeCanvas();
+                    initParticles();
+                });
+
+                resizeCanvas();
+                initParticles();
+                animateParticles();
+            }
+        });
+    </script>
+</body>
+</html>
